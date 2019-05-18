@@ -1,0 +1,39 @@
+{
+  "name": "pss-api-server",
+  "version": "0.0.0",
+  "description": "API server for Personal Shared Storage on Google Compute Cloud",
+  "main": "main.ts",
+  "scripts": {
+    "build": "node pre-processing.js && npx tsc --build && node post-processing.js",
+    "launch": "node dist/main.js",
+    "start": "node pre-processing.js && npx tsc --build && node post-processing.js && node dist/main.js",
+    "docs": "npx typedoc --out docs src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ramtinsoltani/pss-api-server.git"
+  },
+  "author": "Ramtin Soltani <ramtinsoltani93@gmail.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/ramtinsoltani/pss-api-server/issues"
+  },
+  "homepage": "https://github.com/ramtinsoltani/pss-api-server#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "chalk": "^2.4.2",
+    "express": "^4.16.4",
+    "fs-extra": "^7.0.1",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.17.0",
+    "@types/express": "^4.16.1",
+    "@types/fs-extra": "^5.0.5",
+    "@types/lodash": "^4.14.123",
+    "@types/node": "^11.13.7",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.4.5",
+    "uglify-es": "^3.3.9"
+  }
+}
