@@ -4,9 +4,9 @@
   "description": "API server for Personal Shared Storage on Google Compute Cloud",
   "main": "main.ts",
   "scripts": {
-    "build": "node pre-processing.js && npx tsc --build && node post-processing.js",
-    "launch": "node dist/main.js",
-    "start": "node pre-processing.js && npx tsc --build && node post-processing.js && node dist/main.js",
+    "build": "nodejs pre-processing.js && npx tsc --build && nodejs post-processing.js",
+    "launch": "nodejs dist/main.js",
+    "start": "nodejs pre-processing.js && npx tsc --build && nodejs post-processing.js && nodejs dist/main.js",
     "docs": "npx typedoc --out docs src"
   },
   "repository": {
