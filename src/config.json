@@ -1,5 +1,7 @@
 {
   "port": 5000,
   "verboseLogs": true,
-  "predictive404": false
+  "predictive404": false,
+  "tokenSecret": "U0C3MGksioIaLL64932umf7OU2f83aDP",
+  "tokenExpiration": "24h"
 }

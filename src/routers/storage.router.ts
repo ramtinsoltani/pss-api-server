@@ -1,17 +1,19 @@
 import { Router, RouteMethod } from '../core';
-import { Request, Response } from 'express';
+import { ProtectedRequest } from '../models/router.model';
+import { Response } from 'express';
 
 @Router({
   name: 'storage',
+  priority: 99,
   routes: [
-    { path: '/health', method: RouteMethod.GET, handler: 'health' }
+    { path: '/test', handler: 'test', method: RouteMethod.GET }
   ]
 })
 export class StorageRouter {
 
-  health(req: Request, res: Response) {
+  test(req: ProtectedRequest, res: Response) {
 
-    res.status(200).send('SERVER RUNNING');
+    res.status(200).json({ message: `${req.auth.admin ? 'Admin' : 'User'} ${req.auth.username} have accessed this route.` });
 
   }
 
