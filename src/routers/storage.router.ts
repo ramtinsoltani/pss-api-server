@@ -2,6 +2,7 @@ import { Router, RouteMethod, ServerError, ServerConfig, OnInjection, OnConfig, 
 import { ProtectedRequest } from '../models/router.model';
 import { Response } from 'express';
 import { FsService } from '../services/fs.service';
+import { pathValidator } from '../validators/fs.validator';
 
 @Router({
   name: 'storage',
@@ -52,6 +53,7 @@ export class StorageRouter implements OnInjection, OnConfig {
 
     const filename = req.path.substr(3);
 
+    if ( ! pathValidator(filename) ) return res.status(401).json(new ServerError('Path contains invalid tokens!', 'FS_ERROR'));
     if ( ! this.fs.exists(filename) ) return res.status(400).json(new ServerError('Path not found!', 'FS_ERROR'));
 
     this.fs.isDirectory(filename)
@@ -81,6 +83,7 @@ export class StorageRouter implements OnInjection, OnConfig {
 
     const filename = req.path.substr(3);
 
+    if ( ! pathValidator(filename) ) return res.status(401).json(new ServerError('Path contains invalid tokens!', 'FS_ERROR'));
     if ( filename.trim() === '/' ) return res.status(400).json(new ServerError('Cannot delete root!', 'FS_ERROR'));
 
     if ( ! this.fs.exists(filename) ) return res.status(400).json(new ServerError('Path not found!', 'FS_ERROR'));
@@ -95,6 +98,8 @@ export class StorageRouter implements OnInjection, OnConfig {
 
     const filename = req.path.substr(3);
     const dir: boolean = !! req.query.dir;
+
+    if ( ! pathValidator(filename) ) return res.status(401).json(new ServerError('Path contains invalid tokens!', 'FS_ERROR'));
 
     if ( dir ) {
 
