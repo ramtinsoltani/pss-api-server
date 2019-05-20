@@ -8,7 +8,7 @@ import { Request, Response } from 'express';
   ],
   priority: 101
 })
-export class StorageRouter {
+export class HealthRouter {
 
   health(req: Request, res: Response) {
 

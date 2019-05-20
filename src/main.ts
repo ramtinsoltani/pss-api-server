@@ -250,7 +250,6 @@ injectServices(routers);
 // Install body parsers
 app.use(bodyParser.text());
 app.use(bodyParser.json());
-app.use(bodyParser.raw({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Install body parsing error
