@@ -3,7 +3,8 @@ import { MongodbService } from './mongodb.service';
 import fs from 'fs-extra';
 import path from 'path';
 import disk from 'diskusage';
-import { DirectoryInfo } from '../models/fs.model';
+import _ from 'lodash';
+import { DirectoryInfo, FileInfo, SearchResult } from '../models/fs.model';
 import { Request } from 'express';
 
 @Service({
@@ -25,6 +26,57 @@ export class FsService implements OnInjection {
     fs.ensureDir(this.root)
     .then(() => console.log('Data directory ensured...'))
     .catch(console.log);
+
+  }
+
+  private getAllDirectoryInfos(info: DirectoryInfo): Promise<Array<DirectoryInfo>> {
+
+    let allInfos: DirectoryInfo[] = [];
+
+    return new Promise((resolve, reject) => {
+
+      const promises: Promise<DirectoryInfo>[] = [];
+
+      for ( const child of info.children ) {
+
+        if ( ! child.hasOwnProperty('name') ) continue;
+
+        promises.push(this.getDirInfo(child.path));
+
+      }
+
+      if ( ! promises.length ) return resolve([]);
+
+      Promise.all(promises)
+      .then(infos => {
+
+        allInfos = infos;
+
+        const promises: Promise<DirectoryInfo[]>[] = [];
+
+        for ( const info of infos ) {
+
+          promises.push(this.getAllDirectoryInfos(info));
+
+        }
+
+        return Promise.all(promises);
+
+      })
+      .then(infosArray => {
+
+        for ( const infos of infosArray ) {
+
+          allInfos = allInfos.concat(infos);
+
+        }
+
+        resolve(allInfos);
+
+      })
+      .catch(reject);
+
+    });
 
   }
 
@@ -188,6 +240,61 @@ export class FsService implements OnInjection {
 
       })
       .catch(error => reject(new ServerError(error.message, 'FS_ERROR')));
+
+    });
+
+  }
+
+  public search(query: string): Promise<Array<SearchResult>> {
+
+    return new Promise((resolve, reject) => {
+
+      let infos: DirectoryInfo[] = [];
+      const results: SearchResult[] = [];
+
+      this.getDirInfo('/')
+      .then(info => {
+
+        infos.push(info);
+
+        return this.getAllDirectoryInfos(info);
+
+      })
+      .then(all => {
+
+        infos = infos.concat(all);
+
+        for ( const info of infos ) {
+
+          for ( const child of info.children ) {
+
+            if ( child.hasOwnProperty('name') ) {
+
+              results.push({
+                directory: true,
+                name: (<DirectoryInfo>child).name,
+                path: child.path
+              });
+
+            }
+            else {
+
+              results.push({
+                directory: false,
+                name: (<FileInfo>child).filename,
+                path: child.path
+              });
+
+            }
+
+          }
+
+        }
+
+        resolve(_.filter(results, item => item.name.includes(query)));
+
+      })
+      .catch(reject);
 
     });
 

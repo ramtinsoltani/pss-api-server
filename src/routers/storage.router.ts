@@ -1,4 +1,4 @@
-import { Router, RouteMethod, ServerError, ServerConfig, OnInjection, OnConfig, header, custom } from '../core';
+import { Router, RouteMethod, ServerError, ServerConfig, OnInjection, OnConfig, header, custom, query } from '../core';
 import { ProtectedRequest } from '../models/router.model';
 import { Response } from 'express';
 import { FsService } from '../services/fs.service';
@@ -13,6 +13,9 @@ import { FsService } from '../services/fs.service';
     { path: '/fs/*', handler: 'createPath', method: RouteMethod.POST, validate: [
       header({ 'Content-Type': 'application/octet-stream' }),
       custom((req => req.headers.hasOwnProperty('content-length')))
+    ]},
+    { path: '/search', handler: 'search', method: RouteMethod.GET, validate: [
+      query(['query'])
     ]}
   ]
 })
@@ -116,6 +119,14 @@ export class StorageRouter implements OnInjection, OnConfig {
       .catch(error => res.status(400).json(error));
 
     }
+
+  }
+
+  search(req: ProtectedRequest, res: Response) {
+
+    this.fs.search(req.query.query)
+    .then(infos => res.status(200).json(infos))
+    .catch(error => res.status(500).json(new ServerError(error.message, 'FS_ERROR')));
 
   }
 

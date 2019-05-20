@@ -15,3 +15,11 @@ export interface FileInfo {
   modified: number;
 
 }
+
+export interface SearchResult {
+
+  directory: boolean;
+  path: string;
+  name: string;
+
+}
