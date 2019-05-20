@@ -192,4 +192,32 @@ export class MongodbService {
 
   }
 
+  public listUsers(): Promise<User[]> {
+
+    return new Promise((resolve, reject) => {
+
+      UserModel.find({})
+      .then(docs => {
+
+        const users: User[] = [];
+
+        for ( const doc of docs ) {
+
+          users.push({
+            username: doc.get('username'),
+            admin: doc.get('admin'),
+            uid: doc._id
+          });
+
+        }
+
+        resolve(users);
+
+      })
+      .catch(error => reject(new ServerError(error.message, 'DB_ERROR')));
+
+    });
+
+  }
+
 }

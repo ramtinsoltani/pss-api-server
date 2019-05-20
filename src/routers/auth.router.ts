@@ -38,7 +38,8 @@ import jwt from 'jsonwebtoken';
         username: type.string,
         password: passwordHash
       })
-    ]}
+    ]},
+    { path: '/auth/users', handler: 'listUsers', method: RouteMethod.GET }
   ],
   priority: 100
 })
@@ -198,6 +199,16 @@ export class AuthRouter implements OnInjection, OnConfig {
 
     })
     .then(() => res.status(200).json({ message: 'User password was successfully updated.' }))
+    .catch(error => res.status(500).json(error));
+
+  }
+
+  listUsers(req: ProtectedRequest, res: Response) {
+
+    if ( ! req.auth.admin ) return res.status(401).json(new ServerError('User lacks proper permissions to perform this operation!', 'AUTH_ERROR'));
+
+    this.db.listUsers()
+    .then(users => res.status(200).json(users))
     .catch(error => res.status(500).json(error));
 
   }
