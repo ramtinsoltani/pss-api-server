@@ -22,6 +22,7 @@ This server exposes an API to use the hosting Linux system as a cloud storage.
 | DELETE /auth/user | Yes | `token` | `username:string` | [Message Response](#message-response) | Deletes the given username if the current logged in user is an admin. |
 | PUT /auth/user | Yes | `token` | `username:string` `password:base64` | [Message Response](#message-response) | Updates the password of the given username if the current logged in user is an admin. The password must be encoded in base64. |
 | GET /auth/users | Yes | `token` | | [Users List Response](#users-list-response) | Lists all users if the current logged in user is an admin. |
+| GET /auth/user | Yes | `token` | | [User Response](#user-response) | Returns the currently logged in user's information. |
 | GET /space | Yes |`token` | | [Disk Info Response](#disk-info-response) | Returns the disk space information. |
 | GET /fs/* | Yes |`token` | | [Directory Info Response](#directory-info-response) or binary | Returns the directory info or the file content. |
 | DELETE /fs/* | Yes |`token` | | [Message Response](#message-response) | Deletes the given path (directory deletion happens recursively). Keep in mind that the root directory cannot be deleted. |
@@ -66,14 +67,15 @@ This server exposes an API to use the hosting Linux system as a cloud storage.
 
 ## Users List Response
 
+Array of [User Response](#user-response).
+
+## User Response
+
 ```json
-[
-  {
-    "username": "string",
-    "admin": false,
-    "uid": "string"
-  }
-]
+{
+  "username": "string",
+  "admin": false
+}
 ```
 
 ## Disk Info Response
@@ -103,9 +105,9 @@ Children can be directory info and/or [file info](#file-info-response).
 {
   "filename": "string",
   "path": "string",
-  "size": "string",
-  "created": "string",
-  "modified": "string"
+  "size": 0,
+  "created": 0,
+  "modified": 0
 }
 ```
 

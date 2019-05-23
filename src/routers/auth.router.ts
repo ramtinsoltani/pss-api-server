@@ -39,7 +39,8 @@ import jwt from 'jsonwebtoken';
         password: passwordHash
       })
     ]},
-    { path: '/auth/users', handler: 'listUsers', method: RouteMethod.GET }
+    { path: '/auth/users', handler: 'listUsers', method: RouteMethod.GET },
+    { path: '/auth/user', handler: 'getUser', method: RouteMethod.GET }
   ],
   priority: 100
 })
@@ -210,6 +211,15 @@ export class AuthRouter implements OnInjection, OnConfig {
     this.db.listUsers()
     .then(users => res.status(200).json(users))
     .catch(error => res.status(500).json(error));
+
+  }
+
+  getUser(req: ProtectedRequest, res: Response) {
+
+    res.status(200).json({
+      username: req.auth.username,
+      admin: req.auth.admin
+    });
 
   }
 

@@ -36,8 +36,7 @@ export class MongodbService {
 
         resolve({
           username: username,
-          admin: admin,
-          uid: doc._id
+          admin: admin
         });
 
       })
@@ -205,8 +204,7 @@ export class MongodbService {
 
           users.push({
             username: doc.get('username'),
-            admin: doc.get('admin'),
-            uid: doc._id
+            admin: doc.get('admin')
           });
 
         }
