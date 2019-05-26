@@ -1,5 +1,4 @@
-import { Service, OnInjection, ServerError } from '../core';
-import { MongodbService } from './mongodb.service';
+import { Service, ServerError } from '../core';
 import fs from 'fs-extra';
 import path from 'path';
 import disk from 'diskusage';
@@ -10,16 +9,9 @@ import { Request } from 'express';
 @Service({
   name: 'fs'
 })
-export class FsService implements OnInjection {
+export class FsService {
 
-  private db: MongodbService;
-  private readonly root: string = path.join(__dirname, '..', '.data');
-
-  onInjection(services: any) {
-
-    this.db = services.mongodb;
-
-  }
+  private readonly root: string = path.join(process.env.HOME, '.pss-data');
 
   constructor() {
 

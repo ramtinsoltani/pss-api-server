@@ -51,7 +51,7 @@ export class StorageRouter implements OnInjection, OnConfig {
 
   getPath(req: ProtectedRequest, res: Response) {
 
-    const filename = req.path.substr(3);
+    const filename = decodeURI(req.path.substr(3));
 
     if ( ! pathValidator(filename) ) return res.status(401).json(new ServerError('Path contains invalid tokens!', 'FS_ERROR'));
     if ( ! this.fs.exists(filename) ) return res.status(400).json(new ServerError('Path not found!', 'FS_ERROR'));
