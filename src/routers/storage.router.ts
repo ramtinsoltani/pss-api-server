@@ -117,7 +117,7 @@ export class StorageRouter implements OnInjection, OnConfig {
 
         if ( parseInt(req.get('content-length')) > info.available ) throw new ServerError('File size exceeds the available disk space!', 'FS_ERROR');
 
-        return this.fs.writeFile(filename, req);
+        return this.fs.writeFile(decodeURI(filename), req);
 
       })
       .then(() => res.status(200).json({ message: 'File was successfully uploaded.' }))
