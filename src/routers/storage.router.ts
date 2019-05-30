@@ -81,7 +81,7 @@ export class StorageRouter implements OnInjection, OnConfig {
 
   deletePath(req: ProtectedRequest, res: Response) {
 
-    const filename = req.path.substr(3);
+    const filename = decodeURI(req.path.substr(3));
 
     if ( ! pathValidator(filename) ) return res.status(401).json(new ServerError('Path contains invalid tokens!', 'FS_ERROR'));
     if ( filename.trim() === '/' ) return res.status(400).json(new ServerError('Cannot delete root!', 'FS_ERROR'));
@@ -96,7 +96,7 @@ export class StorageRouter implements OnInjection, OnConfig {
 
   createPath(req: ProtectedRequest, res: Response) {
 
-    const filename = req.path.substr(3);
+    const filename = decodeURI(req.path.substr(3));
     const dir: boolean = !! req.query.dir;
 
     if ( ! pathValidator(filename) ) return res.status(401).json(new ServerError('Path contains invalid tokens!', 'FS_ERROR'));
@@ -129,7 +129,7 @@ export class StorageRouter implements OnInjection, OnConfig {
 
   search(req: ProtectedRequest, res: Response) {
 
-    this.fs.search(req.query.query)
+    this.fs.search(decodeURI(req.query.query))
     .then(infos => res.status(200).json(infos))
     .catch(error => res.status(500).json(new ServerError(error.message, 'FS_ERROR')));
 
