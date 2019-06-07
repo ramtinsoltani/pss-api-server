@@ -1,4 +1,4 @@
-import { Router, RouteMethod, ServerError, ServerConfig, OnInjection, OnConfig, header, custom, query } from '../core';
+import { Router, RouteMethod, ServerError, ServerConfig, OnInjection, OnConfig, custom, query } from '../core';
 import { ProtectedRequest } from '../models/router.model';
 import { Response } from 'express';
 import { FsService } from '../services/fs.service';
@@ -12,8 +12,7 @@ import { pathValidator } from '../validators/fs.validator';
     { path: '/fs/*', handler: 'getPath', method: RouteMethod.GET },
     { path: '/fs/*', handler: 'deletePath', method: RouteMethod.DELETE },
     { path: '/fs/*', handler: 'createPath', method: RouteMethod.POST, validate: [
-      header({ 'Content-Type': 'application/octet-stream' }),
-      custom((req => req.headers.hasOwnProperty('content-length')))
+      custom((req => !! req.query.dir || (req.headers.hasOwnProperty('content-length') && req.header('content-type') === 'application/octet-stream')))
     ]},
     { path: '/search', handler: 'search', method: RouteMethod.GET, validate: [
       query(['query'])
