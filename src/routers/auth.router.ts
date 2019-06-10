@@ -13,6 +13,14 @@ import jwt from 'jsonwebtoken';
     { path: '/auth/login', handler: 'login', method: RouteMethod.POST, validate: [
       custom(basicAuthValidator)
     ]},
+    { path: '/auth/user', handler: 'updatePassword', method: RouteMethod.PUT, validate: [
+      header({ 'Content-Type': 'application/json' }),
+      body({
+        username: type.string,
+        password: passwordHash,
+        code: and(type.string, len.range(6, 6))
+      })
+    ]},
     { path: '*', handler: 'verifyToken', validate: [
       query(['token'])
     ]},
@@ -32,15 +40,20 @@ import jwt from 'jsonwebtoken';
         username: type.string
       })
     ]},
-    { path: '/auth/user', handler: 'updatePassword', method: RouteMethod.PUT, validate: [
+    { path: '/auth/user/temp', handler: 'createTempAccessCode', method: RouteMethod.POST, validate: [
       header({ 'Content-Type': 'application/json' }),
       body({
-        username: type.string,
-        password: passwordHash
+        username: type.string
       })
     ]},
     { path: '/auth/users', handler: 'listUsers', method: RouteMethod.GET },
-    { path: '/auth/user', handler: 'getUser', method: RouteMethod.GET }
+    { path: '/auth/user', handler: 'getUser', method: RouteMethod.GET },
+    { path: '/auth/user/promote', handler: 'promoteUser', method: RouteMethod.POST, validate: [
+      header({ 'Content-Type': 'application/json' }),
+      body({
+        username: type.string
+      })
+    ]}
   ],
   priority: 100
 })
@@ -147,7 +160,14 @@ export class AuthRouter implements OnInjection, OnConfig {
 
     if ( ! req.auth.admin ) return res.status(401).json(new ServerError('User lacks proper permissions to perform this operation!', 'AUTH_ERROR'));
 
-    bcrypt.hash(Buffer.from(req.body.password, 'base64').toString(), 10)
+    this.db.isUsernameFree(req.body.username)
+    .then(free => {
+
+      if ( ! free ) throw new ServerError('Username is taken!', 'INVALID_REQUEST');
+
+      return bcrypt.hash(Buffer.from(req.body.password, 'base64').toString(), 10);
+
+    })
     .then(hash => {
 
       return this.db.registerUser(req.body.username, hash, req.body.admin);
@@ -158,7 +178,7 @@ export class AuthRouter implements OnInjection, OnConfig {
       res.status(200).json({ message: 'User was registered successfully.' });
 
     })
-    .catch(error => res.status(500).json(error));
+    .catch(error => res.status(400).json(error));
 
   }
 
@@ -183,24 +203,36 @@ export class AuthRouter implements OnInjection, OnConfig {
     if ( ! req.auth.admin && req.auth.username !== req.body.username )
       return res.status(401).json(new ServerError('User lacks proper permissions to perform this operation!', 'AUTH_ERROR'));
 
-    this.db.deleteUser(req.body.username)
+    this.db.deleteUser(req.body.username, req.auth.username === req.body.username)
     .then(() => res.status(200).json({ message: 'User was successfully deleted.' }))
     .catch(error => res.status(500).json(error));
 
   }
 
-  updatePassword(req: ProtectedRequest, res: Response) {
+  createTempAccessCode(req: ProtectedRequest, res: Response) {
 
     if ( ! req.auth.admin ) return res.status(401).json(new ServerError('User lacks proper permissions to perform this operation!', 'AUTH_ERROR'));
+
+    this.db.createTempAccessCode(req.body.username)
+    .then(code => res.status(200).json({ code: code }))
+    .catch(error => res.status(500).json(error));
+
+  }
+
+  updatePassword(req: Request, res: Response) {
 
     bcrypt.hash(Buffer.from(req.body.password, 'base64').toString(), 10)
     .then(hash => {
 
-      return this.db.updatePassword(req.body.username, hash);
+      return this.db.updatePassword(req.body.username, hash, req.body.code);
 
     })
-    .then(() => res.status(200).json({ message: 'User password was successfully updated.' }))
-    .catch(error => res.status(500).json(error));
+    .then(() => {
+
+      res.status(200).json({ message: 'Password was successfully updated.' });
+
+    })
+    .catch(error => res.status(400).json(error));
 
   }
 
@@ -220,6 +252,16 @@ export class AuthRouter implements OnInjection, OnConfig {
       username: req.auth.username,
       admin: req.auth.admin
     });
+
+  }
+
+  promoteUser(req: ProtectedRequest, res: Response) {
+
+    if ( ! req.auth.admin ) return res.status(401).json(new ServerError('User lacks proper permissions to perform this operation!', 'AUTH_ERROR'));
+
+    this.db.promoteUser(req.body.username)
+    .then(() => res.status(200).json({ message: 'User was promoted successfully.' }))
+    .catch(error => res.status(400).json(error));
 
   }
 

@@ -4,5 +4,6 @@
   "predictive404": false,
   "tokenSecret": "U0C3MGksioIaLL64932umf7OU2f83aDP",
   "tokenExpiration": "24h",
-  "uploadSizeLimit": 5
+  "uploadSizeLimit": 5,
+  "accessCodeExpiration": 300000
 }

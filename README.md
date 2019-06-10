@@ -23,6 +23,9 @@ This server exposes an API to use the hosting Linux system as a cloud storage.
 | PUT /auth/user | Yes | `token` | `username:string` `password:base64` | [Message Response](#message-response) | Updates the password of the given username if the current logged in user is an admin. The password must be encoded in base64. |
 | GET /auth/users | Yes | `token` | | [Users List Response](#users-list-response) | Lists all users if the current logged in user is an admin. |
 | GET /auth/user | Yes | `token` | | [User Response](#user-response) | Returns the currently logged in user's information. |
+| POST /auth/user/promote | Yes | | `username:string` | [Message Response](#message-response) | Promotes the specified user to admin. |
+| POST /auth/user/temp | Yes | | `username:string` | [Code Response](#code-response) | Generates a new temporary access code to be used for password reset. |
+| PUT /auth/user | No | | `username:string` `password:base64`, `code:string` | [Message Response](#message-response) | Updates the password of the specified user using the temporary code. |
 | GET /space | Yes |`token` | | [Disk Info Response](#disk-info-response) | Returns the disk space information. |
 | GET /fs/* | Yes |`token` | | [Directory Info Response](#directory-info-response) or binary | Returns the directory info or the file content. |
 | DELETE /fs/* | Yes |`token` | | [Message Response](#message-response) | Deletes the given path (directory deletion happens recursively). Keep in mind that the root directory cannot be deleted. |
@@ -54,6 +57,14 @@ This server exposes an API to use the hosting Linux system as a cloud storage.
 ```json
 {
   "running": true
+}
+```
+
+## Code Response
+
+```json
+{
+  "code": "string"
 }
 ```
 

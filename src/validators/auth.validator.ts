@@ -31,6 +31,6 @@ export function passwordHash(value: string): boolean {
 
   const password = Buffer.from(value, 'base64').toString();
 
-  return password.length > 8 && password.length < 64 && /[a-z]+/i.test(value) && /[0-9]+/.test(value);
+  return password.length > 8 && password.length < 64 && /[a-z]+/i.test(password) && /[0-9]+/.test(password);
 
 }
